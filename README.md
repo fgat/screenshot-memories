@@ -1,5 +1,5 @@
 # screenshot-memories
-Screenshots represent memories just like photos. This adds the necessary metadata, making it possible to handle them properly alongside digital photos, e.g. in photo albums.
+Screenshots represent memories just like photos. This script adds the necessary metadata to your screenshots, so you can handle them properly alongside digital photos, e.g. in photo albums.
 
 ## Necessary libraries
 * Python 3 Standard Libraries
