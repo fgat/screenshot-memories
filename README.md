@@ -25,7 +25,7 @@ Write changes to files:
 
     screenshot-memories.py screenshotdirectory/*
 
-## What metadata gets added?
+## What metadata is added?
 Metadata is added in *Exif* and *XMP* formats.
 
 * Timestamps as found in filename or file creation date
