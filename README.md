@@ -15,15 +15,15 @@ Files already containing XMP or Exif metadata (e.g. photos or from previous runs
 ### Examples
 In bash, using globbing (`*`) makes bulk changes easy:
 
-    ./screenshot-memories.py --dryrun screenshotdirectory/*png
+    screenshot-memories.py --dryrun screenshotdirectory/*png
 
 Unknown and untested filetypes are ignored, so the following command is safe:
 
-    ./screenshot-memories.py --dryrun screenshotdirectory/*
+    screenshot-memories.py --dryrun screenshotdirectory/*
 
 Write changes to files:
 
-    ./screenshot-memories.py screenshotdirectory/*
+    screenshot-memories.py screenshotdirectory/*
 
 ## What metadata gets added?
 Metadata is added in *Exif* and *XMP* formats.
