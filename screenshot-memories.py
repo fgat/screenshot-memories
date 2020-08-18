@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
 # Copyright 2019 Florian Gruber
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -123,17 +123,20 @@ def guess_time_from_filepath(filepath):
   if match:
     # currently using naive date and time
     # timezone might be useful, maybe pass as command line parameter
-    guessed_datetime = datetime.datetime(
-      int(match.group(1)), # year
-      int(match.group(2)), # month
-      int(match.group(3)), # day
-      hour=int(match.group(4)),
-      minute=int(match.group(5)),
-      second=int(match.group(6)) )
+    # ValueError is thrown if datetimes are out of range
+    try:
+      guessed_datetime = datetime.datetime(
+        int(match.group(1)), # year
+        int(match.group(2)), # month
+        int(match.group(3)), # day
+        hour=int(match.group(4)),
+        minute=int(match.group(5)),
+        second=int(match.group(6)) )
+    except ValueError as e:
+      pass
 
     # uncomment for metadata format testing only:
     #_find_datetime_metadata_fields(filepath, match.group(1))
-
   return guessed_datetime
 
 
@@ -161,16 +164,18 @@ def gather_file_info(filepath):
   return fileinfo
 
 
-def persist_file_info(filepath, fileinfo, dryrun=False):
+def persist_file_info(filepath, fileinfo, dryrun=False, force=False):
   """Writes metadata into the file (except when dryrun is true).
   Existing metadata is not overwritten."""
-  
+
   md = pyexiv2.ImageMetadata(filepath)
   md.read()
   if md.exif_keys or md.xmp_keys:
-    # maybe add --force flag to extend or replace existing metadata
-    print("Refusing to overwrite existing EXIF or XMP data in " + filepath, file=sys.stderr)
-    return
+    if not force:
+      print("Refusing to overwrite existing EXIF or XMP data in " + filepath, file=sys.stderr)
+      return
+    else:
+      print("Forced to overwrite existing EXIF or XMP data in " + filepath, file=sys.stderr)
 
   datetime_obj = choose_best_datetime(fileinfo)
   to_write = {}
@@ -201,12 +206,18 @@ def main():
   args = sys.argv[1:]
 
   if not args:
-    print('usage: [--dryrun] imagefile [imagefile ...] ')
+    print('usage: [--dryrun] [--force] imagefile [imagefile ...] ')
     sys.exit(1)
 
   dryrun = False
+  force = False
+  # TODO: unforce order
   if args[0] == '--dryrun':
     dryrun = True
+    del args[0]
+
+  if args[0] == '--force':
+    force = True
     del args[0]
 
   for filename in args:
@@ -215,7 +226,7 @@ def main():
     try:
       fileinfo = gather_file_info(filepath)
       #print(fileinfo)
-      persist_file_info(filepath, fileinfo, dryrun)
+      persist_file_info(filepath, fileinfo, dryrun, force)
     except InsufficientMetadataError as e:
       print("Error: " + e.message + " Skipping file.", file=sys.stderr)
     except UnsupportedFileTypeError as e:
