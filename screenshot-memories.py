@@ -164,7 +164,7 @@ def gather_file_info(filepath):
   return fileinfo
 
 
-def persist_file_info(filepath, fileinfo, dryrun=False, force=False):
+def persist_file_info(filepath, fileinfo, dryrun=False, force=False, verbose=False):
   """Writes metadata into the file (except when dryrun is true).
   Existing metadata is not overwritten."""
 
@@ -196,7 +196,8 @@ def persist_file_info(filepath, fileinfo, dryrun=False, force=False):
   if not dryrun:
     # write without changing mtime
     md.write(preserve_timestamps=True)
-    print("Writing: " + str(to_write))
+    if verbose:
+      print("Writing: " + str(to_write))
   else:
     print("Dryrun, not writing to file. Would write: " + str(to_write))
 
@@ -206,11 +207,12 @@ def main():
   args = sys.argv[1:]
 
   if not args:
-    print('usage: [--dryrun] [--force] imagefile [imagefile ...] ')
+    print('usage: [--dryrun] [--force] [--verbose] imagefile [imagefile ...] ')
     sys.exit(1)
 
   dryrun = False
   force = False
+  verbose = False
   # TODO: unforce order
   if args[0] == '--dryrun':
     dryrun = True
@@ -220,21 +222,25 @@ def main():
     force = True
     del args[0]
 
+  if args[0] == '--verbose':
+    verbose = True
+    del args[0]
+
   for filename in args:
-    print("Processing: " + filename)
+    if verbose:
+      print("\nProcessing: " + filename)
     filepath = os.path.abspath(filename)
     try:
       fileinfo = gather_file_info(filepath)
       #print(fileinfo)
-      persist_file_info(filepath, fileinfo, dryrun, force)
+      persist_file_info(filepath, fileinfo, dryrun, force, verbose)
     except InsufficientMetadataError as e:
-      print("Error: " + e.message + " Skipping file.", file=sys.stderr)
+      print("Error: " + e.message + " Skipping file " + filepath, file=sys.stderr)
     except UnsupportedFileTypeError as e:
-      print("Error: " + e.message + " Skipping file.", file=sys.stderr)
+      print("Error: " + e.message + " Skipping file " + filepath, file=sys.stderr)
     except (FileNotFoundError, OSError) as e:
-      print("Error: " + str(e) + ". Skipping file.", file=sys.stderr)
+      print("Error: " + str(e) + ". Skipping file " + filepath, file=sys.stderr)
 
-    print()
 
 if __name__ == '__main__':
   main()
