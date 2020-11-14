@@ -117,6 +117,7 @@ def guess_time_from_filepath(filepath):
   #   2016-06-23_16-41-53
   #   2017-03-13-192338
   #   20190815-073404
+  #   2020-11-13
   pattern = r"(\d{4})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})"
   match = re.search(pattern, filepath)
   guessed_datetime = None
@@ -137,6 +138,20 @@ def guess_time_from_filepath(filepath):
 
     # uncomment for metadata format testing only:
     #_find_datetime_metadata_fields(filepath, match.group(1))
+  if not guessed_datetime:
+    # try simple date pattern YYYY-MM-DD
+    pattern = r"(\d{4})-(\d{2})-(\d{2})\D"
+    match = re.search(pattern, filepath)
+    if match:
+      try:
+        guessed_datetime = datetime.datetime(
+          int(match.group(1)), # year
+          int(match.group(2)), # month
+          int(match.group(3)), # day
+          )
+      except ValueError as e:
+        pass
+
   return guessed_datetime
 
 
