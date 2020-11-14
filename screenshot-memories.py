@@ -186,7 +186,7 @@ def persist_file_info(filepath, fileinfo, dryrun=False, force=False, verbose=Fal
     to_write[fieldname] = datetime_obj
 
   # XMP subject conveniently accepts python lists
-  # maybe pass tags as command line parameters and d andfault to "Screenshot".
+  # maybe pass tags as command line parameters and default to "Screenshot".
   #to_write["Xmp.dc.subject"] = ["Screenshot", "Testing"]
   to_write["Xmp.dc.subject"] = ["Screenshot"]
 
